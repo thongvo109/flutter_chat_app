@@ -4,6 +4,7 @@ import 'package:chatweb/repository/login_repository.dart';
 import 'package:chatweb/widget/layout/button_primary.dart';
 import 'package:chatweb/widget/layout/constant.dart';
 import 'package:chatweb/widget/layout/indicator.dart';
+import 'package:chatweb/widget/register/form.dart';
 import 'package:chatweb/widget/symbols/logolarge.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _LoginFormState extends State<LoginForm> with DialogMixin {
   String passWord;
   UserModel user;
   Flushbar flush;
-  bool isLoading;
+
   @override
   void initState() {
     super.initState();
@@ -29,23 +30,21 @@ class _LoginFormState extends State<LoginForm> with DialogMixin {
     email = '';
     passWord = '';
     user = null;
-
-    isLoading = false;
   }
 
   void doLogin() async {
     showProcessingDialog(context);
-    await Future.delayed(Duration(seconds: 1));
+
     UserModel userModel = await LoginRepository().login(
       email: email,
       passWord: passWord,
     );
     hideDialog(context);
     if (userModel.apiError == null) {
-      setState(() {
-        isLoading = false;
-        user = userModel;
-      });
+      showSuccessDialog(context);
+      await Future.delayed(Duration(seconds: 1));
+      hideDialog(context);
+      Navigator.pushNamed(context, '/home');
     } else {
       flush = Flushbar(
           borderRadius: 8,
@@ -115,9 +114,14 @@ class _LoginFormState extends State<LoginForm> with DialogMixin {
                   SizedBox(
                     width: 5,
                   ),
-                  Text(
-                    'Register now',
-                    style: TextStyle(color: kColorPrimary),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/register');
+                    },
+                    child: Text(
+                      'Register now',
+                      style: TextStyle(color: kColorPrimary),
+                    ),
                   )
                 ],
               ),

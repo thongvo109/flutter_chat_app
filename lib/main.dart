@@ -60,11 +60,6 @@ class CheckScreen extends StatelessWidget {
   CheckScreen({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User>();
-    if (firebaseUser != null) {
-      return HomeScreen();
-    } else {
-      return LoginScreen();
-    }
+    return LoginScreen();
   }
 }
