@@ -15,4 +15,14 @@ class LoginRepository {
       password: passWord,
     );
   }
+
+  Future<UserModel> signUp({
+    String email,
+    String passWord,
+  }) async {
+    return _api.signUp(
+      email: email,
+      password: passWord,
+    );
+  }
 }

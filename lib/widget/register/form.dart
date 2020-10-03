@@ -1,9 +1,11 @@
 import 'package:chatweb/api/auth.dart';
+import 'package:chatweb/mixins/dialog_widget.dart';
 import 'package:chatweb/model/user_model.dart';
 import 'package:chatweb/repository/login_repository.dart';
 import 'package:chatweb/widget/layout/button_primary.dart';
 import 'package:chatweb/widget/layout/constant.dart';
 import 'package:chatweb/widget/layout/indicator.dart';
+import 'package:chatweb/widget/symbols/logolarge.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,7 @@ class RegisterForm extends StatefulWidget {
   _RegisterFormState createState() => _RegisterFormState();
 }
 
-class _RegisterFormState extends State<RegisterForm> {
+class _RegisterFormState extends State<RegisterForm> with DialogMixin {
   TextEditingController controllerUserName;
   TextEditingController controllerPassWord;
   String email;
@@ -32,28 +34,21 @@ class _RegisterFormState extends State<RegisterForm> {
     email = '';
     passWord = '';
     user = null;
-
-    isLoading = false;
   }
 
   void doLogin() async {
-    setState(() {
-      isLoading = true;
-    });
-    await Future.delayed(Duration(seconds: 1));
-    UserModel userModel = await LoginRepository().login(
+    showProcessingDialog(context);
+    UserModel userModel = await LoginRepository().signUp(
       email: email,
       passWord: passWord,
     );
+    hideDialog(context);
     if (userModel.apiError == null) {
-      setState(() {
-        isLoading = false;
-        user = userModel;
-      });
+      showSuccessDialog(context);
+      await Future.delayed(Duration(seconds: 1));
+      hideDialog(context);
+      Navigator.pushNamed(context, '/home');
     } else {
-      setState(() {
-        isLoading = false;
-      });
       flush = Flushbar(
           borderRadius: 8,
           margin: EdgeInsets.all(10),
@@ -74,61 +69,65 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    controllerPassWord.dispose();
+    controllerUserName.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return isLoading == true
-        ? Center(
-            child: Indicator(),
-          )
-        : Center(
-            child: Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width / 4,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TextFormField(
-                    decoration: InputDecoration(
-                      hintText: 'Input Username',
-                      icon: Icon(Icons.account_box),
-                    ),
-                    controller: controllerUserName,
-                    onChanged: (value) {
-                      setState(() {
-                        email = value;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(
-                        hintText: 'Input Password', icon: Icon(Icons.vpn_key)),
-                    controller: controllerPassWord,
-                    onChanged: (value) {
-                      setState(() {
-                        passWord = value;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  ButtonPrimary(
-                    color: kColorPrimary,
-                    label: 'Login',
-                    onPressed: () {
-                      doLogin();
-                    },
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                ],
+    return Center(
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width / 4,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            LogoLarge(assetString: 'images/register.png'),
+            TextFormField(
+              decoration: InputDecoration(
+                hintText: 'Input Username',
+                icon: Icon(Icons.account_box),
               ),
+              controller: controllerUserName,
+              onChanged: (value) {
+                setState(() {
+                  email = value;
+                });
+              },
             ),
-          );
+            SizedBox(
+              height: 10,
+            ),
+            TextField(
+              decoration: InputDecoration(
+                  hintText: 'Input Password', icon: Icon(Icons.vpn_key)),
+              controller: controllerPassWord,
+              onChanged: (value) {
+                setState(() {
+                  passWord = value;
+                });
+              },
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ButtonPrimary(
+              color: kColorPrimary,
+              label: 'Register',
+              onPressed: () {
+                doLogin();
+              },
+            ),
+            SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

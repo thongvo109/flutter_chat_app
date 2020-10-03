@@ -54,13 +54,14 @@ class AuthApi extends BaseApi {
   /// This is to make it as easy as possible but a better way would be to
   /// use your own custom class that would take the exception and return better
   /// error messages. That way you can throw, return or whatever you prefer with that instead.
-  Future<String> signUp({String email, String password}) async {
+  Future<UserModel> signUp({String email, String password}) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      var result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      return "Signed up";
-    } on FirebaseAuthException catch (e) {
-      return e.message;
+      User user = result.user;
+      return _userModel(user);
+    } catch (e) {
+      return UserModel.withError(handleError(e));
     }
   }
 
