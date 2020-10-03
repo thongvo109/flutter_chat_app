@@ -1,4 +1,5 @@
 import 'package:chatweb/api/auth.dart';
+import 'package:chatweb/api/database.dart';
 import 'package:chatweb/mixins/dialog_widget.dart';
 import 'package:chatweb/model/user_model.dart';
 import 'package:chatweb/repository/login_repository.dart';
@@ -19,20 +20,25 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> with DialogMixin {
+  TextEditingController controllerEmail;
   TextEditingController controllerUserName;
   TextEditingController controllerPassWord;
   String email;
+  String userName;
   String passWord;
   UserModel user;
   Flushbar flush;
   bool isLoading;
+  DatabaseMethods databaseMethods = DatabaseMethods();
   @override
   void initState() {
     super.initState();
-    controllerUserName = TextEditingController();
+    controllerEmail = TextEditingController();
     controllerPassWord = TextEditingController();
+    controllerUserName = TextEditingController();
     email = '';
     passWord = '';
+    userName = '';
     user = null;
   }
 
@@ -44,6 +50,11 @@ class _RegisterFormState extends State<RegisterForm> with DialogMixin {
     );
     hideDialog(context);
     if (userModel.apiError == null) {
+      Map<String, dynamic> userInfoMap = {
+        "name": userName,
+        "email": email,
+      };
+      databaseMethods.updateUserInfo(userInfoMap);
       showSuccessDialog(context);
       await Future.delayed(Duration(seconds: 1));
       hideDialog(context);
@@ -80,7 +91,7 @@ class _RegisterFormState extends State<RegisterForm> with DialogMixin {
     return Center(
       child: Container(
         height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width / 4,
+        width: MediaQuery.of(context).size.width / 2,
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -90,9 +101,24 @@ class _RegisterFormState extends State<RegisterForm> with DialogMixin {
             TextFormField(
               decoration: InputDecoration(
                 hintText: 'Input Username',
-                icon: Icon(Icons.account_box),
+                icon: Icon(Icons.person),
               ),
               controller: controllerUserName,
+              onChanged: (value) {
+                setState(() {
+                  userName = value;
+                });
+              },
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              decoration: InputDecoration(
+                hintText: 'Input Email',
+                icon: Icon(Icons.account_box),
+              ),
+              controller: controllerEmail,
               onChanged: (value) {
                 setState(() {
                   email = value;

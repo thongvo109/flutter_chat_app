@@ -70,7 +70,7 @@ class _LoginFormState extends State<LoginForm> with DialogMixin {
     return Center(
       child: Container(
         height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width / 4,
+        width: MediaQuery.of(context).size.width / 2,
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
