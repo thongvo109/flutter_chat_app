@@ -8,17 +8,19 @@ class ButtonPrimary extends StatelessWidget {
   final String label;
   final Color color;
   final double radius;
-
+  final Color textColor;
   ButtonPrimary({
     this.height = 50,
     this.onPressed,
     this.label,
     this.color,
     this.radius = 20,
+    this.textColor = Colors.white,
   });
   @override
   Widget build(BuildContext context) {
     return SizedBox(
+      width: MediaQuery.of(context).size.width / 5,
       height: height,
       child: FlatButton(
         shape:
@@ -29,7 +31,7 @@ class ButtonPrimary extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.white,
+            color: textColor,
           ),
         ),
         onPressed: onPressed,
